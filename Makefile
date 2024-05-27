@@ -1,5 +1,5 @@
 # Makefile to build project.
-PROJECT_NAME = Create_database 
+PROJECT_NAME = create_database
 REGION = eu-west-2
 PYTHON_INTERPRETER = python3.12
 WD=$(shell pwd)
