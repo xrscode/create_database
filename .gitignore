@@ -1,0 +1,10 @@
+# Ignore Python virtual environment directory
+venv/
+
+# Ignore environment variable files
+.env
+
+# Ignore Terraform files
+terraform/.terraform/
+terraform.tfstate
+terraform.tfstate.backup
