@@ -55,6 +55,7 @@ resource "aws_ssm_parameter" "db_endpoint" {
 }
 
 # Create Security Group
+# Security Group allows connections to PSQL database.
 resource "aws_security_group" "postgres_allow" {
   name = "postgres-rules"
   description = "provides inbound/outbound rules"
