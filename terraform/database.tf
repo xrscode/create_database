@@ -1,4 +1,8 @@
 # Creates an AWS RDS Database named 'totesys'. 
+# Set Region:
+provider "aws" {
+    region = "eu-west-2"
+}
 
 resource "aws_db_instance" "totesys" {
 # Name of database:
