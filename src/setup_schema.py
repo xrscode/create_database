@@ -1,5 +1,6 @@
 import pg8000
 import boto3
+import json
 
 
 """
@@ -36,6 +37,7 @@ db_user = 'postgres'
 db_host = get_endpoint()[0:-5]
 db_port = 5432
 db_password = get_password()
+
 
 credentials = {'host': db_host,
                'password': db_password,
@@ -115,8 +117,10 @@ def add_data():
         column_names_string = ', '.join(column_names)
         placeholder = ', '.join('%s' for _ in range(len(column_names)))
         values = [list(row.values()) for row in data[table]]
-        query = f"INSERT INTO {
-            table} ({column_names_string}) VALUES ({placeholder});"
+        query = f"""
+        INSERT INTO {table} ({column_names_string})
+        VALUES ({placeholder});
+        """
         cursor.executemany(query, values)
         con.commit()
     con.close()

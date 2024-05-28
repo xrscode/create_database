@@ -2,7 +2,6 @@
 # Store password in AWS Secrets Manager.
 import boto3
 from botocore.exceptions import ClientError
-import json
 
 
 # Prompt user for password to be used with AWS RDS PSQL database
