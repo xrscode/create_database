@@ -30,19 +30,20 @@ while True:
                             break
                     except Exception as e:
                         print('Unable to update secret: ', e)
-                else:
-                    print('Secret does not exist.  Creating secret now...')
-                    # If secret does not exist create secret:
-                    try:
-                        response = client.create_secret(
-                            Name='psql', SecretString=user_input_one)
-                        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-                            print('Secret successfully stored in AWS.')
-                            break
+
                     except Exception as e:
                         print(e)
             except Exception as e:
-                print(e)
+                print('Secret does not exist.  Creating secret now...')
+                # If secret does not exist create secret:
+                try:
+                    response = client.create_secret(
+                        Name='psql', SecretString=user_input_one)
+                    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+                        print('Secret successfully stored in AWS.')
+                        break
+                except Exception as e:
+                    print(e)
         else:
             print(
                 'Password must be alphanumeric only and be between 8 and 20 characters in length.')
