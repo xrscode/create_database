@@ -20,4 +20,11 @@ create-environment:
 requirements:
 	@echo "Installing requirements..."
 	$(PIP) install -r ./requirements.txt
+	chmod +x script.sh
+	chmod +x remove.sh
 
+run:
+	$(ACTIVATE_ENV) && ./script.sh
+
+remove:
+	$(ACTIVATE_ENV) && ./remove.sh

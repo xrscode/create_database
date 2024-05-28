@@ -1,11 +1,9 @@
 import pg8000
 import boto3
-import os
-from dotenv import load_dotenv
 import json
 
 
-# Get address of Database endpoint:
+# Get address of database endpoint:
 def get_endpoint():
     client = boto3.client('ssm')
     response = client.get_parameter(
@@ -14,29 +12,36 @@ def get_endpoint():
     return response['Parameter']['Value']
 
 
+# Get database password:
+def get_password():
+    client = boto3.client('secretsmanager')
+    response = client.get_secret_value(SecretId='psql')
+    return response['SecretString']
+
+
 # Assign Database Credentials:
-db_user = os.getenv('DB_USER')
+db_user = 'postgres'
 db_host = get_endpoint()[0:-5]
-db_port = str(os.getenv('DB_PORT'))
+db_port = 5432
+db_password = get_password()
 
 
 credentials = {'host': db_host,
-               'password': 'password',
+               'password': db_password,
                'user': db_user,
                'port': db_port
                }
 
 # Load DB Instructions
-with open('../data/create_totesys.sql') as file:
+with open('data/create_totesys.sql') as file:
     sql = file.read()
 
 # Load DB JSON
-with open('../data/dbdata.json') as file:
+with open('data/dbdata.json') as file:
     data = json.loads(file.read())
 
+
 # Create database schema:
-
-
 def create_database():
     con = pg8000.connect(**credentials)
     f"""This function will create a PSQL databse."""
@@ -52,7 +57,7 @@ def create_database():
     print('Connection closed.')
 
 
-# Load data into database:
+# Load data into database from supplied json:
 def add_data():
     con = pg8000.connect(**credentials)
     f"""This function will add data to a PSQL database."""
@@ -75,5 +80,6 @@ def add_data():
     pass
 
 
+# Call functions
 create_database()
 add_data()
