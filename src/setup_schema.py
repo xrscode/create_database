@@ -45,9 +45,8 @@ credentials = {'host': db_host,
                'port': db_port
                }
 
+
 # Load database credentials into AWS Secrets Manager:
-
-
 def store_credentials():
     client = boto3.client('secretsmanager')
     # Check secret exists:
