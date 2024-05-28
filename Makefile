@@ -22,9 +22,17 @@ requirements:
 	$(PIP) install -r ./requirements.txt
 	chmod +x script.sh
 	chmod +x remove.sh
+	export PYTHONPATH=$(pwd)
 
 run:
 	$(ACTIVATE_ENV) && ./script.sh
 
 remove:
 	$(ACTIVATE_ENV) && ./remove.sh
+
+autopep:
+	autopep8 --in-place --aggressive --aggressive src/*.py
+
+flake:
+	flake8  src/*.py
+

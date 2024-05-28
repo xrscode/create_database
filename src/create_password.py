@@ -13,7 +13,8 @@ while True:
     user_input_two = input("Please re-enter the database password.")
     if user_input_one == user_input_two:
         print('Passwords match.')
-        if user_input_one.isalnum() and len(user_input_one) > 7 and len(user_input_one) < 21:
+        if user_input_one.isalnum() and len(
+                user_input_one) > 7 and len(user_input_one) < 21:
             print('Password is valid.')
             try:
                 # Check if secret Exists.

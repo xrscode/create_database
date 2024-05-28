@@ -28,9 +28,10 @@ named 'totesys'.
 
 After the password has been set the database will be setup. 
 
+This project will also store the database credentials in AWS Secrets Manager.  It will store them with the SecretId of: 'totesys_cred'.
+
 # database removal
 To remove the database 'totesys' type into the terminal; 
-
     make remove
 
 
