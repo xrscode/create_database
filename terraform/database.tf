@@ -1,7 +1,18 @@
 # Creates an AWS RDS Database named 'totesys'. 
-# Set Region:
+# Set The Region:
 provider "aws" {
     region = "eu-west-2"
+}
+
+# Access AWS Secrets Manager.  Gain PSQL server password:
+# Data source to access the secret metadata
+data "aws_secretsmanager_secret" "psql" {
+  name = "psql"  # Replace with your secret's name
+}
+
+# Data source to access the secret value
+data "aws_secretsmanager_secret_version" "psql_password" {
+  secret_id = data.aws_secretsmanager_secret.psql.id
 }
 
 resource "aws_db_instance" "totesys" {
@@ -20,10 +31,12 @@ resource "aws_db_instance" "totesys" {
 
 # User Credentials:
   username               = "postgres"
-  password               = "password"
-#   db_subnet_group_name   = aws_db_subnet_group.education.name
+  password               = data.aws_secretsmanager_secret_version.psql_password.secret_string
+
+# Set incoming/outgoing connections to allow:
   vpc_security_group_ids = [aws_security_group.postgres_allow.id]
-#   parameter_group_name   = aws_db_parameter_group.education.name
+
+# Allow connections from web:
   publicly_accessible    = true
   
 # Allow Database to be deleted instantly:
@@ -37,6 +50,8 @@ resource "aws_db_instance" "totesys" {
 
 # Set Availability Zone:
   availability_zone = "eu-west-2a" 
+
+depends_on = [ data.aws_secretsmanager_secret_version.psql_password ]
 }
 
 # Turns off SSL:
