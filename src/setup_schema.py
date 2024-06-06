@@ -18,6 +18,7 @@ This will allow ease of access for future projects.
 
 # Get address of database endpoint:
 def get_endpoint():
+    # Get Parameter:
     client = boto3.client('ssm')
     response = client.get_parameter(
         Name='db_endpoint'
@@ -27,6 +28,7 @@ def get_endpoint():
 
 # Get database password:
 def get_password():
+    # Get Secret:
     client = boto3.client('secretsmanager')
     response = client.get_secret_value(SecretId='psql')
     return response['SecretString']
@@ -51,10 +53,11 @@ def store_credentials():
     client = boto3.client('secretsmanager')
     # Check secret exists:
     try:
+        # First check if secret exists:
         print('Checking if secret already exists...')
         response = client.describe_secret(SecretId='totesys_cred')
         if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            # Update credentials:
+            # IF secret exists, UPDATE:
             try:
                 print('Secret exists...updating...')
                 response = client.update_secret(
@@ -65,10 +68,12 @@ def store_credentials():
             except Exception as e:
                 return e
     except Exception as e:
+        # IF Secret does NOT exist create secret:
         print('Secret does not exist.')
         print('Creating secret.')
         response = client.create_secret(
             Name='totesys_cred', SecretString=str(credentials))
+        # Check for status code 200.
         if response['ResponseMetadata']['HTTPStatusCode'] == 200:
             print('Secret succesfully created.')
             return 'Secret successfully created.'
@@ -88,10 +93,14 @@ with open('data/dbdata.json') as file:
 
 # Create database schema:
 def create_database():
+    # Establish connection:
     con = pg8000.connect(**credentials)
     f"""This function will create a PSQL databse."""
+    # Read queries from 'create_totesys.sql'
+    # Split by '; '
     queries = sql.split('; ')
     for query in queries:
+        # For each query, query database to setup schema:
         try:
             con.run(query)
             con.commit()
@@ -104,6 +113,7 @@ def create_database():
 
 # Load data into database from supplied json:
 def add_data():
+    # Establish connection
     con = pg8000.connect(**credentials)
     f"""This function will add data to a PSQL database."""
     cursor = con.cursor()
@@ -113,15 +123,22 @@ def add_data():
         print(f"Adding data to {table}")
         # Extract column names:
         column_names = [x for x in data[table][0]]
+        # Convert column names to string:
         column_names_string = ', '.join(column_names)
+        # Create correct amount of placeholders; %s %s %s...
         placeholder = ', '.join('%s' for _ in range(len(column_names)))
+        # Create list of values
         values = [list(row.values()) for row in data[table]]
+        # Create query
         query = f"""
         INSERT INTO {table} ({column_names_string})
         VALUES ({placeholder});
         """
+        # Use executemany when providing list of values.
+        # Aggregates queries to improve performance:
         cursor.executemany(query, values)
         con.commit()
+    # Close connection
     con.close()
     print('Connection closed.')
     pass
