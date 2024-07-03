@@ -7,8 +7,8 @@ provider "aws" {
 # Access AWS Secrets Manager.  Gain PSQL server password:
 # Data source to access the secret metadata
 data "aws_secretsmanager_secret" "psql" {
-  name = "psql"  # Replace with your secret's name
-}
+  name = "psql"  
+  }
 
 # Data source to access the secret value
 data "aws_secretsmanager_secret_version" "psql_password" {

@@ -17,11 +17,11 @@ This will allow ease of access for future projects.
 
 
 # Get address of database endpoint:
-def get_endpoint():
+def get_endpoint(endpoint):
     # Get Parameter:
     client = boto3.client('ssm')
     response = client.get_parameter(
-        Name='db_endpoint'
+        Name=endpoint
     )
     return response['Parameter']['Value']
 
@@ -36,9 +36,10 @@ def get_password():
 
 # Assign Database Credentials:
 db_user = 'postgres'
-db_host = get_endpoint()[0:-5]
+db_host = get_endpoint('db_endpoint')[0:-5]
 db_port = 5432
 db_password = get_password()
+db_lake = get_endpoint('db_endpoint_dl')[0:-5]
 
 
 credentials = {'host': db_host,
@@ -46,6 +47,11 @@ credentials = {'host': db_host,
                'user': db_user,
                'port': db_port
                }
+credentials_data_lake = {'host': db_lake,
+                         'password': db_password,
+                         'user': db_user,
+                         'port': db_port
+                         }
 
 
 # Load database credentials into AWS Secrets Manager:
@@ -144,7 +150,27 @@ def add_data():
     pass
 
 
-# Call functions:
+with open('data/create_data_lake.sql') as file:
+    dl = file.read()
+
+
+def data_lake_schema():
+    con = pg8000.connect(**credentials_data_lake)
+    queries = dl.split('; ')
+    for query in queries:
+        # For each query, query database to setup schema:
+        try:
+            con.run(query)
+            con.commit()
+        except RuntimeError as e:
+            print(e)
+    print('Database successfully created.')
+    con.close()
+    print('Connection closed.')
+
+
+    # Call functions:
 create_database()
 add_data()
 store_credentials()
+data_lake_schema()
